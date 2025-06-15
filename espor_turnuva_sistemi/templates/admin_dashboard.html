@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Kontrol Paneli | E-Spor Arena</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <!-- Navigasyon Çubuğu -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('index') }}">
+                <i class="fas fa-gamepad me-2"></i>E-Spor Arena
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ url_for('admin_dashboard') }}">
+                            <i class="fas fa-tachometer-alt me-1"></i> Kontrol Paneli
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('admin_results') }}">
+                            <i class="fas fa-trophy me-1"></i> Turnuva Sonuçları
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('admin_users') }}">
+                            <i class="fas fa-users me-1"></i> Kullanıcılar
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('admin_teams') }}">
+                            <i class="fas fa-users-gear me-1"></i> Takımlar
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('admin_logout') }}">
+                            <i class="fas fa-sign-out-alt me-1"></i> Çıkış
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header Section -->
+    <section class="py-4" style="background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), url('https://images.unsplash.com/photo-1542751371-adc38448a05e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1920&q=80') center/cover no-repeat;">
+        <div class="container py-4">
+            <h1 class="text-center">ADMİN KONTROL PANELİ</h1>
+            <p class="lead text-center mb-0">Sistem durumunu ve istatistikleri görüntüleyin</p>
+        </div>
+    </section>
+
+    <!-- Stats Cards Section -->
+    <section class="py-4">
+        <div class="container">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ 'success' if category == 'success' else 'danger' }} mb-4">
+                            <i class="fas {{ 'fa-check-circle' if category == 'success' else 'fa-exclamation-circle' }} me-2"></i>
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            
+            <div class="row g-4">
+                <div class="col-md-3">
+                    <div class="stats-card">
+                        <div class="stats-value">{{ user_count }}</div>
+                        <div class="stats-title">Kayıtlı Kullanıcı</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card">
+                        <div class="stats-value">{{ tournament_count }}</div>
+                        <div class="stats-title">Turnuva</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card">
+                        <div class="stats-value">{{ team_count }}</div>
+                        <div class="stats-title">Takım</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card">
+                        <div class="stats-value">{{ total_prize }} ₺</div>
+                        <div class="stats-title">Toplam Ödül Havuzu</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Admin Actions Section -->
+    <section class="py-4">
+        <div class="container">
+            <h2 class="mb-4"><i class="fas fa-cogs me-2"></i> Yönetim İşlemleri</h2>
+            
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <i class="fas fa-trophy me-2"></i> Turnuva Yönetimi
+                        </div>
+                        <div class="card-body">
+                            <p>Turnuvaları görüntüleyin, düzenleyin, sonuçları yönetin veya yeni turnuva ekleyin.</p>
+                            <div class="d-grid gap-2">
+                                <a href="{{ url_for('admin_results') }}" class="btn btn-primary">
+                                    <i class="fas fa-medal me-2"></i> Sonuçları Yönet
+                                </a>
+                                <a href="{{ url_for('add_tournament') }}" class="btn btn-success">
+                                    <i class="fas fa-plus-circle me-2"></i> Yeni Turnuva Ekle
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <i class="fas fa-users me-2"></i> Kullanıcı Yönetimi
+                        </div>
+                        <div class="card-body">
+                            <p>Kullanıcıları görüntüleyin ve yönetin. Gerektiğinde kullanıcı bilgilerini düzenleyin.</p>
+                            <a href="{{ url_for('admin_users') }}" class="btn btn-primary">
+                                <i class="fas fa-user-edit me-2"></i> Kullanıcıları Yönet
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <i class="fas fa-chart-line me-2"></i> Raporlar
+                        </div>
+                        <div class="card-body">
+                            <p>İstatistikler, oyun türü bazında katılım ve ödül dağılımı raporu görüntüleyin.</p>
+                            <a href="#" class="btn btn-primary">
+                                <i class="fas fa-file-alt me-2"></i> Raporları Görüntüle
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Turnuva Listesi -->
+    <section class="py-4">
+        <div class="container">
+            <h2 class="mb-4"><i class="fas fa-trophy me-2"></i> Turnuva Yönetimi</h2>
+            
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span>Tüm Turnuvalar</span>
+                    <a href="{{ url_for('add_tournament') }}" class="btn btn-sm btn-success">
+                        <i class="fas fa-plus-circle me-1"></i> Yeni Turnuva
+                    </a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Turnuva Adı</th>
+                                <th>Oyun</th>
+                                <th>Tarih</th>
+                                <th>Ödül Havuzu</th>
+                                <th>İşlemler</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for tournament in tournaments %}
+                            <tr>
+                                <td>{{ tournament[0] }}</td>
+                                <td>{{ tournament[4] if tournament[4] else 'Turnuva #' ~ tournament[0] }}</td>
+                                <td>{{ tournament[1] }}</td>
+                                <td>{{ tournament[2].strftime('%d.%m.%Y') }}</td>
+                                <td>{{ tournament[3] if tournament[3] else '0' }} ₺</td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="{{ url_for('edit_tournament', tournament_id=tournament[0]) }}" class="btn btn-primary">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteTournament{{ tournament[0] }}">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </div>
+                                    
+                                    <!-- Silme Onay Modal -->
+                                    <div class="modal fade" id="deleteTournament{{ tournament[0] }}" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title text-dark">Turnuva Silme Onayı</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body text-dark">
+                                                    <p>#{{ tournament[0] }} numaralı {{ tournament[1] }} turnuvasını silmek istediğinize emin misiniz?</p>
+                                                    <p class="text-danger">Bu işlem geri alınamaz!</p>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                                                    <form action="{{ url_for('delete_tournament', tournament_id=tournament[0]) }}" method="POST">
+                                                        <button type="submit" class="btn btn-danger">Evet, Sil</button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Recent Activity Section -->
+    <section class="py-4" style="background-color: var(--dark-alt);">
+        <div class="container">
+            <h2 class="mb-4"><i class="fas fa-bell me-2"></i> Son Aktiviteler</h2>
+            
+            <div class="card">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Mesaj</th>
+                                <th>Tarih</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for log in recent_logs %}
+                            <tr>
+                                <td>
+                                    <i class="fas {% if 'New user' in log[1] %}fa-user-plus text-success{% elif 'Tournament result updated' in log[1] %}fa-chart-line text-warning{% else %}fa-info-circle text-info{% endif %} me-2"></i>
+                                    {{ log[1] }}
+                                </td>
+                                <td>{{ log[2] }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-4" style="background-color: var(--dark-alt);">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h3 class="h5 mb-3">E-Spor Arena Yönetici Paneli</h3>
+                    <p class="mb-3">Profesyonel e-spor turnuva yönetim sistemi.</p>
+                    <p class="mb-0">&copy; 2025 E-Spor Arena. Tüm hakları saklıdır.</p>
+                </div>
+                <div class="col-md-3">
+                    <h5 class="mb-3">Hızlı Bağlantılar</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="{{ url_for('admin_dashboard') }}">Kontrol Paneli</a></li>
+                        <li><a href="{{ url_for('admin_results') }}">Turnuva Sonuçları</a></li>
+                        <li><a href="{{ url_for('index') }}">Web Sitesi Ana Sayfası</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h5 class="mb-3">Güvenlik</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="{{ url_for('admin_logout') }}">Güvenli Çıkış</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kullanıcı Yönetimi | E-Spor Arena</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <!-- Navigasyon Çubuğu -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('index') }}">
+                <i class="fas fa-gamepad me-2"></i>E-Spor Arena
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('admin_dashboard') }}">
+                            <i class="fas fa-tachometer-alt me-1"></i> Kontrol Paneli
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('admin_results') }}">
+                            <i class="fas fa-trophy me-1"></i> Turnuva Sonuçları
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ url_for('admin_users') }}">
+                            <i class="fas fa-users me-1"></i> Kullanıcılar
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('admin_teams') }}">
+                            <i class="fas fa-users-gear me-1"></i> Takımlar
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('admin_logout') }}">
+                            <i class="fas fa-sign-out-alt me-1"></i> Çıkış
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header Section -->
+    <section class="py-4" style="background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), url('https://images.unsplash.com/photo-1542751371-adc38448a05e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1920&q=80') center/cover no-repeat;">
+        <div class="container py-4">
+            <h1 class="text-center">KULLANICI YÖNETİMİ</h1>
+            <p class="lead text-center mb-0">Sisteme kayıtlı tüm kullanıcıları yönetin</p>
+        </div>
+    </section>
+
+    <!-- Users List Section -->
+    <section class="py-5">
+        <div class="container">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ 'success' if category == 'success' else 'danger' }} mb-4">
+                            <i class="fas {{ 'fa-check-circle' if category == 'success' else 'fa-exclamation-circle' }} me-2"></i>
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span><i class="fas fa-users me-2"></i> Tüm Kullanıcılar</span>
+                    <div>
+                        <input type="text" id="userSearch" class="form-control form-control-sm" placeholder="Kullanıcı ara..." style="width: 200px;">
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table mb-0" id="usersTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Kullanıcı Adı</th>
+                                <th>E-posta</th>
+                                <th>Favori Oyun</th>
+                                <th>Kayıt Tarihi</th>
+                                <th>İşlemler</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in users %}
+                            <tr>
+                                <td>{{ user.id }}</td>
+                                <td>{{ user.username }}</td>
+                                <td>{{ user.email }}</td>
+                                <td>
+                                    {% if user.favorite_game == 'Valorant' %}
+                                    <span class="badge bg-danger">{{ user.favorite_game }}</span>
+                                    {% elif user.favorite_game == 'League of Legends' %}
+                                    <span class="badge bg-primary">{{ user.favorite_game }}</span>
+                                    {% elif user.favorite_game == 'CS:GO' %}
+                                    <span class="badge bg-warning text-dark">{{ user.favorite_game }}</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">{{ user.favorite_game }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ user.created_at }}</td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="{{ url_for('player_profile', user_id=user.id) }}" class="btn btn-info" target="_blank">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{{ url_for('edit_user', user_id=user.id) }}" class="btn btn-primary">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteUser{{ user.id }}">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </div>
+                                    
+                                    <!-- Silme Onay Modal -->
+                                    <div class="modal fade" id="deleteUser{{ user.id }}" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content bg-dark text-light border-primary">
+                                                <div class="modal-header border-bottom border-primary">
+                                                    <h5 class="modal-title">Kullanıcı Silme Onayı</h5>
+                                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <p><strong>{{ user.username }}</strong> kullanıcısını silmek istediğinize emin misiniz?</p>
+                                                    <p class="text-danger">Bu işlem geri alınamaz!</p>
+                                                </div>
+                                                <div class="modal-footer border-top border-primary">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                                                    <form action="{{ url_for('delete_user', user_id=user.id) }}" method="POST">
+                                                        <button type="submit" class="btn btn-danger">Evet, Sil</button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-4" style="background-color: var(--dark-alt);">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h3 class="h5 mb-3">E-Spor Arena Yönetici Paneli</h3>
+                    <p class="mb-0">Turnuva ve kullanıcı yönetimi için özel panel.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="mb-0">&copy; 2025 E-Spor Arena. Tüm hakları saklıdır.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='custom.js') }}"></script>
+    <script>
+        // Kullanıcı arama fonksiyonu
+        document.getElementById('userSearch').addEventListener('keyup', function() {
+            const searchText = this.value.toLowerCase();
+            const rows = document.querySelectorAll('#usersTable tbody tr');
+            
+            rows.forEach(row => {
+                const username = row.cells[1].textContent.toLowerCase();
+                const email = row.cells[2].textContent.toLowerCase();
+                
+                if (username.includes(searchText) || email.includes(searchText)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,54 @@
+E-SPOR TURNUVA SİSTEMİ SUNUMU ÇALIŞMA KAĞIDI
+
+1. ER DİYAGRAMI VE SİSTEM TANIMI (5-7 dakika)
+- ER diyagramını göster (erd_schema.png)
+- Veritabanı yapısını açıkla:
+  * Turnuvalar tablosu
+  * Takımlar tablosu
+  * Oyuncular tablosu
+  * Maçlar tablosu
+  * Sonuçlar tablosu
+- Her tablonun ilişkilerini ve anahtarlarını açıkla
+
+2. ARAYÜZ TANITIMI (8-10 dakika)
+- Modern ve e-spor temalı tasarımın özellikleri
+  * Karanlık tema
+  * Mor ve turkuaz renk şeması
+  * Rajdhani ve Orbitron fontları
+- Ana sayfa özellikleri
+- Turnuva listesi ve detayları
+- Kayıt formu ve gerekli alanlar
+- Sonuçlar ve sıralama tablosu
+- Oyun türü renk kodlaması gösterimi
+
+3. KAYNAK KODLAR (8-10 dakika)
+- Python dosyalarını göster (app.py)
+- Ana fonksiyonları açıkla:
+  * Turnuva yönetimi
+  * Takım yönetimi
+  * Maç yönetimi
+  * Sonuç yönetimi
+- SQL sorgularını göster (espor_turnuva_sistemi.sql)
+  * Tablo oluşturma
+  * Veri ekleme
+  * Veri güncelleme
+  * Veri silme
+  * Veri sorgulama
+
+4. ÖZEL ÖZELLİKLER (3-4 dakika)
+- Oyun türü bazlı renk kodlaması
+- Modern UI bileşenleri
+- Veri doğrulama ve hata yönetimi
+- Sıralama sistemi algoritmaları
+
+5. SORU-CEVAP (5 dakika)
+- Öğretmenin sorularını yanıtlama
+- Ek açıklamalar
+
+Toplam Süre: ~30-35 dakika
+
+ÖNEMLI NOTLAR:
+- Her grup üyesi kendi kodlarını açıklayacak
+- Kodları açıkken açıklamalar yap
+- Arayüz gösterimlerinde canlı demo yap
+- Her bölümde örneklere odaklan

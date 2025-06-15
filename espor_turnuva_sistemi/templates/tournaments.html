@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Turnuvalar | E-Spor Arena</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        /* Filter Card Styles */
+        .card.filter-card {
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(30, 30, 47, 0.8);
+            backdrop-filter: blur(10px);
+        }
+        
+        .filter-card .form-control,
+        .filter-card .form-select {
+            background-color: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            height: 45px;
+            margin-bottom: 0;
+        }
+        
+        .filter-card .form-control:focus,
+        .filter-card .form-select:focus {
+            background-color: rgba(0, 0, 0, 0.3);
+            border-color: #4e73ff;
+            color: white;
+            box-shadow: 0 0 0 0.25rem rgba(78, 115, 255, 0.25);
+        }
+        
+        .filter-card .btn-primary {
+            height: 45px;
+            font-weight: 500;
+            background: linear-gradient(45deg, #4e73ff, #6f42c1);
+            border: none;
+            transition: all 0.3s ease;
+            margin-top: 0 !important;
+        }
+        
+        .filter-card .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(78, 115, 255, 0.3);
+        }
+        
+        .tournament-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: none;
+            border-radius: 10px;
+            overflow: hidden;
+            background: linear-gradient(145deg, #1e1e2f, #252540);
+            color: #fff;
+        }
+        
+        .tournament-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .tournament-card .card-header {
+            background: rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            padding: 1rem 1.25rem;
+        }
+        
+        .tournament-card .game-icon {
+            font-size: 1.5rem;
+            opacity: 0.8;
+        }
+        
+        .tournament-card .card-body {
+            padding: 1.5rem;
+        }
+        
+        .tournament-card .card-title {
+            font-weight: 600;
+            margin-bottom: 1rem;
+            min-height: 3em;
+        }
+        
+        .tournament-meta {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.25rem;
+        }
+        
+        .tournament-meta i {
+            width: 20px;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .game-badge {
+            font-size: 0.8rem;
+            padding: 0.4em 0.8em;
+        }
+        
+        /* Game-specific themes */
+        .valorant-theme {
+            border-top: 4px solid #ff4655;
+        }
+        
+        .lol-theme {
+            border-top: 4px solid #00a8e7;
+        }
+        
+        .csgo-theme {
+            border-top: 4px solid #f1c40f;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigasyon Çubuğu -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('index') }}">
+                <i class="fas fa-gamepad me-2"></i>E-Spor Arena
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('index') }}">
+                            <i class="fas fa-home me-1"></i> Ana Sayfa
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ url_for('tournaments') }}">
+                            <i class="fas fa-trophy me-1"></i> Turnuvalar
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('results') }}">
+                            <i class="fas fa-list-ol me-1"></i> Sonuçlar
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('top_players') }}">
+                            <i class="fas fa-medal me-1"></i> En İyi Oyuncular
+                        </a>
+                    </li>
+                    {% if 'user_id' in session %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('profile') }}">
+                            <i class="fas fa-user me-1"></i> Profilim
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('create_team') }}">
+                            <i class="fas fa-users me-1"></i> Takım Oluştur
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('logout') }}">
+                            <i class="fas fa-sign-out-alt me-1"></i> Çıkış
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('login') }}">
+                            <i class="fas fa-sign-in-alt me-1"></i> Giriş Yap
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('register') }}">
+                            <i class="fas fa-user-plus me-1"></i> Kayıt Ol
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header Section -->
+    <section class="py-4" style="background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1511512578047-dfb367046420?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1920&q=80') center/cover no-repeat;">
+        <div class="container py-4">
+            <h1 class="text-center">TURNUVALAR</h1>
+            <p class="lead text-center mb-0">Yaklaşan ve devam eden tüm turnuvaları keşfedin</p>
+        </div>
+    </section>
+
+    <!-- Filter Section -->
+    <section class="py-4">
+        <div class="container">
+            <div class="card filter-card">
+                <div class="card-header">
+                    <i class="fas fa-filter me-2"></i> Turnuva Filtresi
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST" class="row g-4 align-items-end">
+                        <div class="col-md-5">
+                            <label for="game_type" class="form-label mb-1">Oyun Türü</label>
+                            <select name="game_type" id="game_type" class="form-select">
+                                <option value="" {% if not request.form.get('game_type') %}selected{% endif %}>Tümü</option>
+                                <option value="Valorant" {% if request.form.get('game_type') == 'Valorant' %}selected{% endif %}>Valorant</option>
+                                <option value="League of Legends" {% if request.form.get('game_type') == 'League of Legends' %}selected{% endif %}>League of Legends</option>
+                                <option value="CS:GO" {% if request.form.get('game_type') == 'CS:GO' %}selected{% endif %}>CS:GO</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-5">
+                            <label for="min_prize" class="form-label mb-1">Minimum Ödül (₺)</label>
+                            <div class="input-group">
+                                <input type="number" name="min_prize" id="min_prize" 
+                                       class="form-control text-light" 
+                                       step="0.01" 
+                                       placeholder="Minimum ödül miktarı" 
+                                       value="{{ request.form.get('min_prize', '') }}">
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary w-100 py-2" style="margin-bottom: 8px;">
+                                <i class="fas fa-search me-2"></i> Filtrele
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tournaments List Section -->
+    <section class="py-4">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="mb-0"><i class="fas fa-trophy me-2"></i> Turnuva Listesi</h2>
+                <div class="text-white">{{ tournaments|length }} turnuva bulundu</div>
+            </div>
+            
+            {% if not tournaments %}
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i> Filtrenize uygun turnuva bulunamadı.
+            </div>
+            {% else %}
+            <div class="row g-4">
+                {% for tournament in tournaments %}
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="card h-100 tournament-card {% if tournament[1] == 'Valorant' %}valorant-theme{% elif tournament[1] == 'League of Legends' %}lol-theme{% elif tournament[1] == 'CS:GO' %}csgo-theme{% endif %}">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <span class="badge {% if 'Tamamlandı' in tournament[5] %}bg-secondary{% elif 'Bugün' in tournament[5] %}bg-success{% else %}bg-primary{% endif %} mb-0">
+                                {{ tournament[5] }}
+                            </span>
+                            <div class="game-icon">
+                                {% if tournament[1] == 'Valorant' %}
+                                <i class="fas fa-crosshairs"></i>
+                                {% elif tournament[1] == 'League of Legends' %}
+                                <i class="fas fa-dragon"></i>
+                                {% elif tournament[1] == 'CS:GO' %}
+                                <i class="fas fa-crosshairs"></i>
+                                {% else %}
+                                <i class="fas fa-gamepad"></i>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title">{{ tournament[4] }}</h5>
+                            <div class="tournament-meta mb-3">
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="far fa-calendar-alt me-2"></i>
+                                    <span>{{ tournament[2].strftime('%d %B %Y') }}</span>
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-trophy me-2"></i>
+                                    <span class="fw-bold">{{ "{:,.2f}".format(tournament[3]) }} ₺</span>
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="badge game-badge {% if tournament[1] == 'Valorant' %}bg-danger{% elif tournament[1] == 'League of Legends' %}bg-info{% elif tournament[1] == 'CS:GO' %}bg-warning text-dark{% endif %}">
+                                    {{ tournament[1] }}
+                                </span>
+                                <a href="{{ url_for('tournament_detail', tournament_id=tournament[0]) }}" class="btn btn-sm btn-outline-light">
+                                    <i class="fas fa-arrow-right me-1"></i> Detaylar
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+    </section>
+
+
+
+    <!-- Footer -->
+    <footer class="py-4" style="background-color: var(--dark-alt);">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h3 class="h5 mb-3">E-Spor Arena</h3>
+                    <p class="mb-3">Profesyonel e-spor turnuva yönetim sistemi.</p>
+                    <p class="mb-0">&copy; 2025 E-Spor Arena. Tüm hakları saklıdır.</p>
+                </div>
+                <div class="col-md-3">
+                    <h5 class="mb-3">Hızlı Bağlantılar</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="{{ url_for('index') }}">Ana Sayfa</a></li>
+                        <li><a href="{{ url_for('register') }}">Kayıt Ol</a></li>
+                        <li><a href="{{ url_for('create_team') }}">Takım Oluştur</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h5 class="mb-3">Bizi Takip Edin</h5>
+                    <div class="d-flex gap-3">
+                        <a href="#" class="text-decoration-none"><i class="fab fa-twitter fa-lg"></i></a>
+                        <a href="#" class="text-decoration-none"><i class="fab fa-twitch fa-lg"></i></a>
+                        <a href="#" class="text-decoration-none"><i class="fab fa-discord fa-lg"></i></a>
+                        <a href="#" class="text-decoration-none"><i class="fab fa-youtube fa-lg"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
